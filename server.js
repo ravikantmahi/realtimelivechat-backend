@@ -6,11 +6,18 @@ const cors = require('cors');
 const app = express();
 app.use(cors());
 
+// 1. THIS FIXES THE "Cannot GET /" ERROR ON RENDER
+app.get('/', (req, res) => {
+    res.send('Chat Backend is running successfully!');
+});
+
 const server = http.createServer(app);
 
 const io = new Server(server, {
     cors: {
-        origin: "http://localhost:3000",
+        // 2. THIS ALLOWS YOUR VERCEL APP TO CONNECT
+        // Replace this exact string with your live Vercel URL (No slash at the end!)
+        origin: "https://realtimelivechat.vercel.app", 
         methods: ["GET", "POST"]
     }
 });
