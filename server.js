@@ -19,16 +19,22 @@ const io = new Server(server, {
     }
 });
 
-// Track online users
+// Track online users mapping socket.id to username
 let onlineUsers = {};
 
 io.on("connection", (socket) => {
     console.log(`User Connected: ${socket.id}`);
 
-    // When a user joins, add them to the list and broadcast the new list
+    // When a user joins
     socket.on("user_joined", (username) => {
         onlineUsers[socket.id] = username;
         io.emit("active_users", Object.values(onlineUsers));
+        
+        // Broadcast system message that someone joined
+        socket.broadcast.emit("system_message", { 
+            text: `👋 ${username} just joined the room!`, 
+            type: "join" 
+        });
     });
 
     socket.on("send_message", (data) => {
@@ -43,8 +49,16 @@ io.on("connection", (socket) => {
         socket.broadcast.emit("clear_typing");
     });
 
-    // When a user leaves, remove them and update everyone else
+    // When a user leaves
     socket.on("disconnect", () => {
+        const username = onlineUsers[socket.id];
+        if (username) {
+            // Broadcast system message that someone left
+            socket.broadcast.emit("system_message", { 
+                text: `🏃‍♂️ ${username} left the chat.`, 
+                type: "leave" 
+            });
+        }
         console.log("User Disconnected:", socket.id);
         delete onlineUsers[socket.id];
         io.emit("active_users", Object.values(onlineUsers));
