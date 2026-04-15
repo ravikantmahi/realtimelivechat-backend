@@ -14,7 +14,7 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
     cors: {
-        origin: "https://voiddiscussion.vercel.app/", 
+        origin: "https://voiddiscussion.vercel.app", 
         methods: ["GET", "POST"]
     }
 });
